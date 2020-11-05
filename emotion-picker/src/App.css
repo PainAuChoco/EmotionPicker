@@ -27,3 +27,12 @@
 .App-link {
   color: #61dafb;
 }
+
+.navBtn{
+  margin-bottom: 50%;
+}
+
+#currentPainting{
+  height: 500px;
+  width: 500px;
+}
