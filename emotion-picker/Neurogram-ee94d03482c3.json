@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "neurogram",
+  "private_key_id": "ee94d03482c3afd422dd98020d58fee82c61e3f5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCvorImtE42xeNI\nmpMLYdhpfoIuwwmQ2FZMB7gIfQEbBdW1/4O36lDBUW6Dplae62GJRlVKiOxfwKmx\njpBBxumX7D4UkO5iT/wBeW1V9AYA/JkgjIIhIimGHAUAdpxTK1XSYuZMumLj7Yd4\nNL+mkbsjDI9VxQgMWHP9q9vPypcUexDUYLE+x2QBKE/RvgjoDCzqhrN/+48QSVBR\nOnUoV5dh3EhPcPtcR4LYMhrtssrVI3YmKlSFmOo4/6QRCYuouv/li6wwQ+PhfcMw\niXRonK82w8KzP4gxNUnO1/bofHVO/RVz/Pgh5zMK2b6K7lt1dbYsnM/PLzbNYX24\nqjqt4annAgMBAAECggEAAOwe+Q1lBGxJSMYoXodu2QL6kQn3gLoPc0pua3uokqlB\nruPUH8D3F+94X/BIL9Z28SnG5I4lMPg0i+5T5fHdo9ga7VsOKBhZGkg2dvHsntBf\ncih6vczNoLArUI4kPQWTEk3wUq0p5sjbt28OJe70UiH3QLvjp8Ob0am3jPb4kHl2\nFMOUb6JeKwTNCN/Onet5hMmRHkbfivqCEEU/8liIF5I4cJ/W5wmN6oZWovsELoJ3\nUJaG5Q1MGkJu4Uhwb0xnlBTBIKX9Nt2bZkuykRBM2OywVle0QYUuRqd+Hw26SSPr\no4/qpPWujFroa0/hsf/zart8DZqv5ot6LxQayvG4mQKBgQDX1D7kydiSq2RDo0gP\nFOk0Qh/IJkzwIARuGtbcPC2W0/oW4p4L3lDZoFzgVsunMq3uSAoLNfo7wESMTWEF\n6/rNbUp+hFbn2wHa6prmuNEnZTSBtZO5mO3z5aRsutNU6/LgfnYfNFNIQ6BvciHs\n1+YQ1EBAMQQVqq1anDcAluNlHwKBgQDQU1IfW6opMNh2itAb/vRHrio+ZzOHH1cT\neDuEZWx/LRPlq5fnxgXR8hiMi4H7ct5K9S2wJfJe9shgvxT1gZy1hIcw19lAUT9W\nD0/5GWSzacTczIw+vuF1hbNlko+1QAz5d0h11+NgZi/uXCOUBNgbWmsZ50GwRgCU\nwD/AMKUaOQKBgQCS6wQ1McGfddQ2xruSqKVm0WxZDtlozCK34MVJ/hz6gynG0lTL\nt3ZJ7oPKosrW8gS8I4XSw9enPOZsq2/UXCLKHA+NuACAq/DDWNhBHqYhrx7i/Pum\nZ5fzYuteqH6bXFJkxzEZZMEcfAyGUKcPVphh9FoYWEVzik+fUp+OYyg/+QKBgDcY\n4k5i2vU78vQfMH1HB+pxWMDaYJlrI4eFtBAHFxPnoyyKHonxKJbnNbDuMLmFHt+q\nSqQc1SZilIpp3ywzVHP5khvL6qyFEIA9WoRiP+znm2ZePvVVXKHNc634fkOMpiHQ\nd3ybVYqoXCLpgYtjYJiTaGIYdJofWYX99p5o/zGZAoGBAIBBXmpVmhsJjt6gTkCr\nmFayRBpP0o0v6A05IKgmBzgaghDhUrngD3g5mYbgPTkEmWoVcdnyoXw95B529314\n10YhvdBEM47JEil8qniByVQuc+iDQz21sJ6ucZSs7pBn76uOIj2sVAENuffLxVtO\nzg45eS1JZE6AYmtuuh46wITp\n-----END PRIVATE KEY-----\n",
+  "client_email": "neurogram@neurogram.iam.gserviceaccount.com",
+  "client_id": "111328981120470383533",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/neurogram%40neurogram.iam.gserviceaccount.com"
+}
