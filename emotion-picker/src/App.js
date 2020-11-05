@@ -3,6 +3,25 @@ import React from "react";
 import ImageContainer from './Components/ImageContainer'
 import VotingButtons from './Components/VotingButtons'
 import Button from "@material-ui/core/Button"
+import GDImageViewer from './GDImageViewer';
+import './GDImageViewer.css'
+
+const required_fields = {
+  gkey: "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc",
+  dirId: "1x2BqcvGBuyGYugdgFVFuLU2y91QrfAJW",
+  name: "ff555ddf7526fbb7218e3b51f4ad8ae5_positive.jpg",
+  options: {
+    style: {},
+    onClick: {
+      modal: true,
+      newWindow: false
+    },
+    exclude: {},
+    attachClass: {},
+    attachId: {},
+    hover: true
+  },
+}
 
 class App extends React.Component {
 
@@ -63,8 +82,11 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          Emotion Picker by Neurogram
-          {this.state.mostViewedPaintings.length !== 0 &&
+          <span id="title">Emotion Picker by Neurogram</span>
+          <div style={{width: "100%"}}>
+            <GDImageViewer data={required_fields} currentId={this.state.currentPhoto}/>
+          </div>
+          {/*this.state.mostViewedPaintings.length !== 0 &&
             <React.Fragment>
               <ImageContainer
                 url={this.state.mostViewedPaintings[this.state.currentPhoto].image}
@@ -79,7 +101,7 @@ class App extends React.Component {
                 callbackClick={this.handleVote}
               />
             </React.Fragment>
-          }
+          */}
         </header>
       </div>
     )

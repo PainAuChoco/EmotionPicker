@@ -31,6 +31,7 @@
 #navBtn{
   display: flex;
   justify-content: space-between;
+  margin: 1em
 }
 
 #currentPainting{
@@ -41,4 +42,8 @@
   display: flex;
   justify-content: space-between;
   width: 400px
+}
+
+#title{
+  margin: 1em;
 }
