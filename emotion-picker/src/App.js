@@ -13,14 +13,20 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    this.fetchMostViewed()
+  }
+
+  fetchMostViewed = () => {
     var proxyUrl = 'https://cors-anywhere.herokuapp.com/', targetUrl = 'https://www.wikiart.org/en/api/2/MostViewedPaintings?imageFormat=Blog'
     fetch(proxyUrl + targetUrl)
       .then(res => res.json())
       .then((response) => {
         console.log(response)
         var MostViewedPaintings = response.data
+        var paginationToken = response.paginationToken
         this.setState({
-          mostViewedPaintings: MostViewedPaintings
+          mostViewedPaintings: MostViewedPaintings,
+          currentPaginationToken: paginationToken
         })
       })
       .catch(error => console.log(error))
@@ -38,6 +44,9 @@ class App extends React.Component {
 
   nextPhoto = () => {
     var currentPhoto = this.state.currentPhoto
+    if (currentPhoto === this.state.mostViewedPaintings.length - 1) {
+
+    }
     this.setState({
       currentPhoto: currentPhoto + 1
     })
