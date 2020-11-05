@@ -28,11 +28,17 @@
   color: #61dafb;
 }
 
-.navBtn{
-  margin-bottom: 50%;
+#navBtn{
+  display: flex;
+  justify-content: space-between;
 }
 
 #currentPainting{
   height: 500px;
   width: 500px;
+}
+#votingButtons{
+  display: flex;
+  justify-content: space-between;
+  width: 400px
 }

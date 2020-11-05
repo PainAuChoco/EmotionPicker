@@ -8,7 +8,8 @@ class App extends React.Component {
 
   state = {
     mostViewedPaintings: [],
-    currentPhoto: 0
+    currentPhoto: 0,
+    votes: {}
   }
 
   componentDidMount() {
@@ -25,12 +26,14 @@ class App extends React.Component {
       .catch(error => console.log(error))
   }
 
-  handleVote = () => {
-    fetch('/listFiles')
-      .then(res => res.json())
-      .then((response) => {
-        console.log(response)
-      })
+  handleVote = (type) => {
+    var photoId = this.state.mostViewedPaintings[this.state.currentPhoto].id
+    var votes = this.state.votes
+    votes[photoId] = type
+    this.setState({
+      votes: votes
+    })
+    this.nextPhoto()
   }
 
   nextPhoto = () => {
@@ -59,9 +62,9 @@ class App extends React.Component {
               //width={400}
               //height={300}
               />
-              <div className="d-flex inline">
-                <Button className="navBtn" disabled={this.state.currentPhoto === 0} variant="contained" onClick={this.previousPhoto} value="<">{"<"}</Button>
-                <Button className="navBtn" disabled={this.state.currentPhoto === this.state.mostViewedPaintings.length - 1} variant="contained" onClick={this.nextPhoto} value=">">{">"}</Button>
+              <div id="navBtn">
+                <Button disabled={this.state.currentPhoto === 0} variant="contained" onClick={this.previousPhoto} value="<">{"<"}</Button>
+                <Button disabled={this.state.currentPhoto === this.state.mostViewedPaintings.length - 1} variant="contained" onClick={this.nextPhoto} value=">">{">"}</Button>
               </div>
               <VotingButtons
                 callbackClick={this.handleVote}
