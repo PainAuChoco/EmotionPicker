@@ -23,19 +23,42 @@ const required_fields = {
   },
 }
 
+const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
+const GOOGLE_DRIVE_URL_START = "https://www.googleapis.com/drive/v2/files?q=%27";
+const GOOGLE_DRIVE_URL_END = "%27+in+parents&key=";
+const GOOGLE_DRIVE_IMG_URL = "http://drive.google.com/uc?export=view&id=";
+
+
 class App extends React.Component {
 
   state = {
-    mostViewedPaintings: [],
+    //mostViewedPaintings: [],
     currentPhoto: 0,
-    votes: {}
+    votes: {},
+    paintings: []
   }
 
   componentDidMount() {
-    this.fetchMostViewed()
+    this.loadData()
   }
 
-  fetchMostViewed = () => {
+  loadData = () => {
+    fetch(
+      GOOGLE_DRIVE_URL_START +
+      '1x2BqcvGBuyGYugdgFVFuLU2y91QrfAJW' +
+      GOOGLE_DRIVE_URL_END +
+      GOOGLE_API_KEY
+    )
+      .then(response => response.json())
+      .then(jsonResp => {
+        var data = jsonResp.items
+        this.setState({
+          paintings: data
+        })
+      });
+  }
+
+  /*fetchMostViewed = () => {
     var proxyUrl = 'https://cors-anywhere.herokuapp.com/', targetUrl = 'https://www.wikiart.org/en/api/2/MostViewedPaintings?imageFormat=Blog'
     fetch(proxyUrl + targetUrl)
       .then(res => res.json())
@@ -49,10 +72,10 @@ class App extends React.Component {
         })
       })
       .catch(error => console.log(error))
-  }
+  }*/
 
   handleVote = (type) => {
-    var photoId = this.state.mostViewedPaintings[this.state.currentPhoto].id
+    var photoId = this.state.paintings[this.state.currentPhoto].id
     var votes = this.state.votes
     votes[photoId] = type
     this.setState({
@@ -63,9 +86,6 @@ class App extends React.Component {
 
   nextPhoto = () => {
     var currentPhoto = this.state.currentPhoto
-    if (currentPhoto === this.state.mostViewedPaintings.length - 1) {
-
-    }
     this.setState({
       currentPhoto: currentPhoto + 1
     })
@@ -83,25 +103,29 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           <span id="title">Emotion Picker by Neurogram</span>
-          <div style={{width: "100%"}}>
-            <GDImageViewer data={required_fields} currentId={this.state.currentPhoto}/>
-          </div>
-          {/*this.state.mostViewedPaintings.length !== 0 &&
+          {this.state.paintings.length !== 0 &&
             <React.Fragment>
               <ImageContainer
-                url={this.state.mostViewedPaintings[this.state.currentPhoto].image}
-              //width={400}
-              //height={300}
+                url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[this.state.currentPhoto].id}
+                width={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.width}
+                height={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.height}
               />
+              <div hidden>
+                <ImageContainer
+                  url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[this.state.currentPhoto + 1].id}
+                  width={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.width}
+                  height={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.height}
+                />
+              </div>
               <div id="navBtn">
                 <Button disabled={this.state.currentPhoto === 0} variant="contained" onClick={this.previousPhoto} value="<">{"<"}</Button>
-                <Button disabled={this.state.currentPhoto === this.state.mostViewedPaintings.length - 1} variant="contained" onClick={this.nextPhoto} value=">">{">"}</Button>
+                <Button disabled={this.state.currentPhoto === this.state.paintings.length - 1} variant="contained" onClick={this.nextPhoto} value=">">{">"}</Button>
               </div>
               <VotingButtons
                 callbackClick={this.handleVote}
               />
             </React.Fragment>
-          */}
+          }
         </header>
       </div>
     )

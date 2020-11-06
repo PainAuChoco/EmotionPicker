@@ -75,6 +75,7 @@ function GDImageViewer(data, currentPhoto) {
     )
       .then(response => response.json())
       .then(jsonResp => {
+        console.log(jsonResp)
         setImgIds(jsonResp.items);
       });
   }
