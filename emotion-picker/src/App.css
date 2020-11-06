@@ -24,6 +24,12 @@
   color: white;
 }
 
+#title{
+  top: 10px;
+  left: 10px;
+  position: absolute;
+}
+
 .App-link {
   color: #61dafb;
 }
@@ -45,4 +51,8 @@
 
 #title{
   margin: 1em;
+}
+
+#returnbtn{
+  margin-left: 1em
 }

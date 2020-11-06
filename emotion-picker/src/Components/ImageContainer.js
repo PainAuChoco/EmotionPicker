@@ -27,10 +27,6 @@ class ImageContainer extends React.Component {
         }
     }
 
-    handleLoad = (e) => {
-        console.log(e)
-    }
-
     render() {
         return (
             <div id="currentPainting">
@@ -38,7 +34,6 @@ class ImageContainer extends React.Component {
                     src={this.props.url}
                     width={this.state.width}
                     height={this.state.height}
-                    onLoad={this.handleLoad}
                 />
             </div>
         )

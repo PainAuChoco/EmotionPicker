@@ -3,31 +3,13 @@ import React from "react";
 import ImageContainer from './Components/ImageContainer'
 import VotingButtons from './Components/VotingButtons'
 import Button from "@material-ui/core/Button"
-import GDImageViewer from './GDImageViewer';
-import './GDImageViewer.css'
-
-const required_fields = {
-  gkey: "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc",
-  dirId: "1x2BqcvGBuyGYugdgFVFuLU2y91QrfAJW",
-  name: "ff555ddf7526fbb7218e3b51f4ad8ae5_positive.jpg",
-  options: {
-    style: {},
-    onClick: {
-      modal: true,
-      newWindow: false
-    },
-    exclude: {},
-    attachClass: {},
-    attachId: {},
-    hover: true
-  },
-}
+import DirectoriesButtons from './Components/DirectoriesButtons'
 
 const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
 const GOOGLE_DRIVE_URL_START = "https://www.googleapis.com/drive/v2/files?q=%27";
 const GOOGLE_DRIVE_URL_END = "%27+in+parents&key=";
 const GOOGLE_DRIVE_IMG_URL = "http://drive.google.com/uc?export=view&id=";
-
+const MAIN_FOLDER_ID = "11XVfzHUzqEStME89y-PgJZIOa-MlUODm"
 
 class App extends React.Component {
 
@@ -35,49 +17,93 @@ class App extends React.Component {
     //mostViewedPaintings: [],
     currentPhoto: 0,
     votes: {},
-    paintings: []
+    paintings: [],
+    dirId: "",
+    dirName: "",
+    directories: [],
+    subDirsId: [],
+    temp: []
   }
 
   componentDidMount() {
-    this.loadData()
+    this.loadDirectoriesName()
+    //this.loadData()
   }
 
-  loadData = () => {
+  loadDirectoriesName = () => {
     fetch(
       GOOGLE_DRIVE_URL_START +
-      '1x2BqcvGBuyGYugdgFVFuLU2y91QrfAJW' +
+      MAIN_FOLDER_ID +
+      GOOGLE_DRIVE_URL_END +
+      GOOGLE_API_KEY
+    )
+      .then(response => response.json())
+      .then(jsonResp => {
+        var dirs = jsonResp.items
+        this.setState({
+          directories: dirs
+        })
+      });
+  }
+
+  loadSubDirs = (dirId) => {
+    fetch(
+      GOOGLE_DRIVE_URL_START +
+      dirId +
+      GOOGLE_DRIVE_URL_END +
+      GOOGLE_API_KEY
+    )
+      .then(response => response.json())
+      .then(jsonResp => {
+        var subDirsId = [], paintings = this.state.paintings
+        jsonResp.items.forEach((subdir) => {
+          subDirsId.push(subdir.id)
+        })
+        this.setState({
+          subDirsId: subDirsId
+        })
+        subDirsId.forEach(id => {
+          this.loadData(id)
+        });
+      })
+  }
+
+  concatSubDirs = () => {
+    var temp = this.state.temp
+    console.log(typeof (temp))
+    console.log(temp)
+    var arr = Object.keys(temp).reduce(function (res, v) {
+      console.log("bonjour")
+      return res.concat(temp[v]);
+    }, []);
+    this.setState({
+      paintings: arr
+    })
+  }
+
+  loadData = (dirId) => {
+    fetch(
+      GOOGLE_DRIVE_URL_START +
+      dirId +
       GOOGLE_DRIVE_URL_END +
       GOOGLE_API_KEY
     )
       .then(response => response.json())
       .then(jsonResp => {
         var data = jsonResp.items
-        this.setState({
-          paintings: data
-        })
-      });
-  }
-
-  /*fetchMostViewed = () => {
-    var proxyUrl = 'https://cors-anywhere.herokuapp.com/', targetUrl = 'https://www.wikiart.org/en/api/2/MostViewedPaintings?imageFormat=Blog'
-    fetch(proxyUrl + targetUrl)
-      .then(res => res.json())
-      .then((response) => {
-        console.log(response)
-        var MostViewedPaintings = response.data
-        var paginationToken = response.paginationToken
-        this.setState({
-          mostViewedPaintings: MostViewedPaintings,
-          currentPaginationToken: paginationToken
-        })
+        console.log(data)
+        /*var temp = this.state.temp
+        temp.push(data)
+        this.state.temp = temp*/
+        this.setState({paintings: data})
       })
       .catch(error => console.log(error))
-  }*/
+  }
 
   handleVote = (type) => {
-    var photoId = this.state.paintings[this.state.currentPhoto].id
+    var photoTitle = this.state.paintings[this.state.currentPhoto].title
     var votes = this.state.votes
-    votes[photoId] = type
+    votes[photoTitle] = type
     this.setState({
       votes: votes
     })
@@ -98,13 +124,45 @@ class App extends React.Component {
     })
   }
 
+  handleDirectorySelection = (dirName) => {
+    var dirId
+    this.state.directories.forEach(dir => {
+      if (dir.title === dirName) dirId = dir.id
+    });
+    this.setState({
+      dirId: dirId,
+      dirName: dirName,
+    })
+    this.loadSubDirs(dirId)
+  }
+
+  handleReturnClick = () => {
+    this.setState({
+      dirId: "",
+      paintings: []
+    })
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <span id="title">Emotion Picker by Neurogram</span>
+          <div id="title">
+            Emotion Picker by Neurogram
+            {this.state.dirId !== "" &&
+              <Button id="returnbtn" variant="outlined" color="secondary" onClick={this.handleReturnClick}>Return</Button>
+            }
+          </div>
+          <div>
+          </div>
+          {this.state.dirId === "" &&
+            <DirectoriesButtons
+              handleDirectorySelection={this.handleDirectorySelection}
+            />
+          }
           {this.state.paintings.length !== 0 &&
             <React.Fragment>
+              <span>{this.state.dirName}</span>
               <ImageContainer
                 url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[this.state.currentPhoto].id}
                 width={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.width}
@@ -117,10 +175,11 @@ class App extends React.Component {
                   height={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.height}
                 />
               </div>
-              <div id="navBtn">
+              {/*Navigation buttons
+              <div id="navBtn" hidden>
                 <Button disabled={this.state.currentPhoto === 0} variant="contained" onClick={this.previousPhoto} value="<">{"<"}</Button>
                 <Button disabled={this.state.currentPhoto === this.state.paintings.length - 1} variant="contained" onClick={this.nextPhoto} value=">">{">"}</Button>
-              </div>
+          </div>*/}
               <VotingButtons
                 callbackClick={this.handleVote}
               />
