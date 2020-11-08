@@ -4,6 +4,7 @@ import ImageContainer from './Components/ImageContainer'
 import VotingButtons from './Components/VotingButtons'
 import Button from "@material-ui/core/Button"
 import DirectoriesButtons from './Components/DirectoriesButtons'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
 const GOOGLE_DRIVE_URL_START = "https://www.googleapis.com/drive/v2/files?q=%27";
@@ -21,13 +22,44 @@ class App extends React.Component {
     dirId: "",
     dirName: "",
     directories: [],
-    subDirsId: [],
-    temp: []
+    positive: [],
+    negative: [],
+    neutral: [],
+    currentWidth: 0,
+    currentHeight: 0,
+    loading: false,
   }
 
   componentDidMount() {
     this.loadDirectoriesName()
     //this.loadData()
+  }
+
+  componentDidUpdate() {
+    if (this.state.positive.length !== 0 && this.state.negative.length !== 0 && this.state.neutral.length !== 0) {
+      var paintings = []
+      paintings = paintings.concat(this.state.negative)
+      paintings = paintings.concat(this.state.positive)
+      paintings = paintings.concat(this.state.neutral)
+      paintings = this.shuffleArray(paintings)
+      var currentWidth = paintings[0].imageMediaMetadata.width
+      var currentHeight = paintings[0].imageMediaMetadata.height
+      this.setState({
+        paintings: paintings,
+        positive: [],
+        negative: [],
+        neutral: [],
+        currentHeight: currentHeight,
+        currentWidth: currentWidth,
+        loading: false
+      })
+    }
+
+    if (this.state.currentPhoto === 299) {
+      this.setState({
+        lockButtons: true
+      })
+    }
   }
 
   loadDirectoriesName = () => {
@@ -46,7 +78,7 @@ class App extends React.Component {
       });
   }
 
-  loadSubDirs = (dirId) => {
+  loadSubDir = (dirId) => {
     fetch(
       GOOGLE_DRIVE_URL_START +
       dirId +
@@ -55,33 +87,16 @@ class App extends React.Component {
     )
       .then(response => response.json())
       .then(jsonResp => {
-        var subDirsId = [], paintings = this.state.paintings
         jsonResp.items.forEach((subdir) => {
-          subDirsId.push(subdir.id)
+          this.setState({
+            loading: true,
+          })
+          this.loadData(subdir.id, subdir.title)
         })
-        this.setState({
-          subDirsId: subDirsId
-        })
-        subDirsId.forEach(id => {
-          this.loadData(id)
-        });
       })
   }
 
-  concatSubDirs = () => {
-    var temp = this.state.temp
-    console.log(typeof (temp))
-    console.log(temp)
-    var arr = Object.keys(temp).reduce(function (res, v) {
-      console.log("bonjour")
-      return res.concat(temp[v]);
-    }, []);
-    this.setState({
-      paintings: arr
-    })
-  }
-
-  loadData = (dirId) => {
+  loadData = (dirId, type) => {
     fetch(
       GOOGLE_DRIVE_URL_START +
       dirId +
@@ -91,11 +106,29 @@ class App extends React.Component {
       .then(response => response.json())
       .then(jsonResp => {
         var data = jsonResp.items
-        console.log(data)
-        /*var temp = this.state.temp
-        temp.push(data)
-        this.state.temp = temp*/
-        this.setState({paintings: data})
+        switch (type) {
+          case "positive":
+            {
+              this.setState({
+                positive: data
+              })
+              break;
+            }
+          case "neutral":
+            {
+              this.setState({
+                neutral: data
+              })
+              break;
+            }
+          case "negative":
+            {
+              this.setState({
+                negative: data
+              })
+              break;
+            }
+        }
       })
       .catch(error => console.log(error))
   }
@@ -103,7 +136,14 @@ class App extends React.Component {
   handleVote = (type) => {
     var photoTitle = this.state.paintings[this.state.currentPhoto].title
     var votes = this.state.votes
-    votes[photoTitle] = type
+    if (votes[this.state.dirName] === undefined) {
+      votes[this.state.dirName] = []
+    }
+    votes[this.state.dirName].push({
+      id: photoTitle,
+      vote: type
+    })
+
     this.setState({
       votes: votes
     })
@@ -112,6 +152,9 @@ class App extends React.Component {
 
   nextPhoto = () => {
     var currentPhoto = this.state.currentPhoto
+    var paintings = this.state.paintings
+    paintings.splice(currentPhoto, 1)
+    console.log(paintings.length)
     this.setState({
       currentPhoto: currentPhoto + 1
     })
@@ -133,7 +176,7 @@ class App extends React.Component {
       dirId: dirId,
       dirName: dirName,
     })
-    this.loadSubDirs(dirId)
+    this.loadSubDir(dirId)
   }
 
   handleReturnClick = () => {
@@ -141,6 +184,16 @@ class App extends React.Component {
       dirId: "",
       paintings: []
     })
+  }
+
+  shuffleArray = (array) => {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
+    return array
   }
 
   render() {
@@ -160,29 +213,30 @@ class App extends React.Component {
               handleDirectorySelection={this.handleDirectorySelection}
             />
           }
+          {this.state.loading &&
+            <div class="spinner-border" role="status"></div>
+          }
           {this.state.paintings.length !== 0 &&
             <React.Fragment>
               <span>{this.state.dirName}</span>
               <ImageContainer
                 url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[this.state.currentPhoto].id}
-                width={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.width}
-                height={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.height}
+                width={this.state.currentWidth}
+                height={this.state.currentHeight}
               />
               <div hidden>
                 <ImageContainer
                   url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[this.state.currentPhoto + 1].id}
-                  width={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.width}
-                  height={this.state.paintings[this.state.currentPhoto].imageMediaMetadata.height}
+                  width={this.state.paintings[this.state.currentPhoto + 1].imageMediaMetadata.width}
+                  height={this.state.paintings[this.state.currentPhoto + 1].imageMediaMetadata.height}
                 />
               </div>
-              {/*Navigation buttons
-              <div id="navBtn" hidden>
-                <Button disabled={this.state.currentPhoto === 0} variant="contained" onClick={this.previousPhoto} value="<">{"<"}</Button>
-                <Button disabled={this.state.currentPhoto === this.state.paintings.length - 1} variant="contained" onClick={this.nextPhoto} value=">">{">"}</Button>
-          </div>*/}
-              <VotingButtons
-                callbackClick={this.handleVote}
-              />
+              {!this.state.lockButtons &&
+                <VotingButtons
+                  callbackClick={this.handleVote}
+                />
+              }
+
             </React.Fragment>
           }
         </header>
