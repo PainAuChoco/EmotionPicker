@@ -9,21 +9,21 @@ export default function DirectoriesButtons({ handleDirectorySelection }) {
             <div style={{margin: "1em"}}>Pick a painting genre</div>
             <div>
                 <ButtonGroup>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("abstract")}>Abstract</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("animal-painting")}>Animal Painting</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("cityscape")}>CityScape</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("figurative")}>Figurative</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("flower-painting")}>Flower Painting</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("genre-painting")}>Genre Painting</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("abstract")}>Abstract</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("animal-painting")}>Animal Painting</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("cityscape")}>CityScape</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("figurative")}>Figurative</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("flower-painting")}>Flower Painting</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("genre-painting")}>Genre Painting</Button>
                 </ButtonGroup>
                 <ButtonGroup>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("landscape")}>Landscape</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("marina")}>Marina</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("mythological-painting")}>Mythological Painting</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("nude-painting-nu")}>Nude Painting</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("portrait")}>Portrait</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("still-life")}>Still Life</Button>
-                    <Button color="primary" variant="contained" onClick={() => handleDirectorySelection("symbolic-painting")}>Symbolic Painting</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("landscape")}>Landscape</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("marina")}>Marina</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("mythological-painting")}>Mythological Painting</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("nude-painting-nu")}>Nude Painting</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("portrait")}>Portrait</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("still-life")}>Still Life</Button>
+                    <Button className="noOutline" color="primary" variant="contained" onClick={() => handleDirectorySelection("symbolic-painting")}>Symbolic Painting</Button>
                 </ButtonGroup>
             </div>
         </div>

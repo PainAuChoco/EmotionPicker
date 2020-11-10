@@ -15,8 +15,6 @@ const MAIN_FOLDER_ID = "11XVfzHUzqEStME89y-PgJZIOa-MlUODm"
 class App extends React.Component {
 
   state = {
-    //mostViewedPaintings: [],
-    currentPhoto: 0,
     votes: [],
     paintings: [],
     dirId: "",
@@ -32,7 +30,6 @@ class App extends React.Component {
 
   componentDidMount() {
     this.loadDirectoriesName()
-    //this.loadData()
   }
 
   componentDidUpdate() {
@@ -52,12 +49,6 @@ class App extends React.Component {
         currentHeight: currentHeight,
         currentWidth: currentWidth,
         loading: false
-      })
-    }
-
-    if (this.state.currentPhoto === 299) {
-      this.setState({
-        lockButtons: true
       })
     }
   }
@@ -134,7 +125,7 @@ class App extends React.Component {
   }
 
   handleVote = (type) => {
-    var photoTitle = this.state.paintings[this.state.currentPhoto].title
+    var photoTitle = this.state.paintings[0].title
     var votes = this.state.votes
     votes.push({
       id: photoTitle,
@@ -150,24 +141,15 @@ class App extends React.Component {
   }
 
   nextPhoto = () => {
-    var currentPhoto = this.state.currentPhoto
     var paintings = this.state.paintings
-    paintings.splice(currentPhoto, 1)
-    
-    var currentWidth = paintings[this.state.currentPhoto + 1].imageMediaMetadata.width
-    var currentHeight = paintings[this.state.currentPhoto + 1].imageMediaMetadata.height
-    
+    paintings.splice(0, 1)
+
+    var currentWidth = paintings[0].imageMediaMetadata.width
+    var currentHeight = paintings[0].imageMediaMetadata.height
+
     this.setState({
-      currentPhoto: currentPhoto + 1,
       currentHeight: currentHeight,
       currentWidth: currentWidth
-    })
-  }
-
-  previousPhoto = () => {
-    var currentPhoto = this.state.currentPhoto
-    this.setState({
-      currentPhoto: currentPhoto - 1
     })
   }
 
@@ -231,24 +213,29 @@ class App extends React.Component {
             />
           }
           {this.state.loading &&
-            <div class="spinner-border" role="status"></div>
+            <div className="spinner-border" role="status"></div>
           }
           {this.state.paintings.length !== 0 &&
             <React.Fragment>
               <span>{this.state.dirName}</span>
               <ImageContainer
-                url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[this.state.currentPhoto].id}
+                url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[0].id}
                 width={this.state.currentWidth}
                 height={this.state.currentHeight}
               />
-              <div hidden>
-                <ImageContainer
-                  url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[this.state.currentPhoto + 1].id}
-                  width={this.state.paintings[this.state.currentPhoto + 1].imageMediaMetadata.width}
-                  height={this.state.paintings[this.state.currentPhoto + 1].imageMediaMetadata.height}
-                />
-              </div>
-              {!this.state.lockButtons &&
+              {this.state.paintings[1] !== undefined &&
+                <div hidden>
+                  <ImageContainer
+                    url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[1].id}
+                    width={this.state.paintings[1].imageMediaMetadata.width}
+                    height={this.state.paintings[1].imageMediaMetadata.height}
+                  />
+                </div>
+              }
+              {this.state.paintings.length < 10 &&
+                <div id="alert" className="mb-1">Warning: only {this.state.paintings.length -2} artworks left to classify in this genre !</div>
+              }
+              {this.state.paintings.length >= 4 &&
                 <VotingButtons
                   callbackClick={this.handleVote}
                 />
