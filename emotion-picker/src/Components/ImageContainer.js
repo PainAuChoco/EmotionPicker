@@ -5,7 +5,8 @@ class ImageContainer extends React.Component {
 
     state = {
         width: 0,
-        height: 0
+        height: 0,
+        progress: 0
     }
 
     componentDidMount() {
@@ -15,6 +16,31 @@ class ImageContainer extends React.Component {
     componentDidUpdate(prevProps) {
         if (prevProps.url !== this.props.url) {
             this.computeRatio()
+
+            /*var self = this
+            Image.prototype.load = function (url) {
+                var thisImg = this;
+                var xmlHTTP = new XMLHttpRequest();
+                xmlHTTP.open('GET', url, true);
+                xmlHTTP.responseType = 'arraybuffer';
+                xmlHTTP.setRequestHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+                xmlHTTP.onprogress = function (e) {
+                    thisImg.completedPercentage = parseInt((e.loaded / e.total) * 100);
+                    console.log(thisImg.completedPercentage)
+                    self.setState({
+                        progress: thisImg.completedPercentage
+                    })
+                };
+                xmlHTTP.onloadstart = function () {
+                    thisImg.completedPercentage = 0;
+                };
+                xmlHTTP.send();
+            };
+            Image.prototype.completedPercentage = 0;
+
+            var img = new Image();
+            img.load(this.props.url);
+            img.src = this.props.url*/
         }
     }
 

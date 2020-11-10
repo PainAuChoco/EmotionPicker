@@ -17,7 +17,7 @@ class App extends React.Component {
   state = {
     //mostViewedPaintings: [],
     currentPhoto: 0,
-    votes: {},
+    votes: [],
     paintings: [],
     dirId: "",
     dirName: "",
@@ -136,12 +136,11 @@ class App extends React.Component {
   handleVote = (type) => {
     var photoTitle = this.state.paintings[this.state.currentPhoto].title
     var votes = this.state.votes
-    if (votes[this.state.dirName] === undefined) {
-      votes[this.state.dirName] = []
-    }
-    votes[this.state.dirName].push({
+    votes.push({
       id: photoTitle,
-      vote: type
+      type: this.state.dirName,
+      previous: photoTitle.split('_')[1].split('.')[0],
+      vote: type.toLowerCase()
     })
 
     this.setState({
@@ -154,9 +153,14 @@ class App extends React.Component {
     var currentPhoto = this.state.currentPhoto
     var paintings = this.state.paintings
     paintings.splice(currentPhoto, 1)
-    console.log(paintings.length)
+    
+    var currentWidth = paintings[this.state.currentPhoto + 1].imageMediaMetadata.width
+    var currentHeight = paintings[this.state.currentPhoto + 1].imageMediaMetadata.height
+    
     this.setState({
-      currentPhoto: currentPhoto + 1
+      currentPhoto: currentPhoto + 1,
+      currentHeight: currentHeight,
+      currentWidth: currentWidth
     })
   }
 
@@ -194,6 +198,19 @@ class App extends React.Component {
       array[j] = temp;
     }
     return array
+  }
+
+  submitVotes = () => {
+    var votes = this.state.votes
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ votes: votes })
+    }
+
+    fetch('/submit', requestOptions)
+      .then(res => console.log(res))
+      .catch(error => console.log(error))
   }
 
   render() {
@@ -236,8 +253,10 @@ class App extends React.Component {
                   callbackClick={this.handleVote}
                 />
               }
-
             </React.Fragment>
+          }
+          {Object.entries(this.state.votes).length !== 0 &&
+            <Button id="submitBtn" className="noOutline" variant="contained" color="primary" value="Submit" onClick={this.submitVotes}>Submit</Button>
           }
         </header>
       </div>

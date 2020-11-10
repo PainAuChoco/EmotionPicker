@@ -30,6 +30,16 @@
   position: absolute;
 }
 
+.noOutline {
+  outline: none !important;  
+}
+
+#submitBtn{
+  top: 90%;
+  left: 90%;
+  position: absolute;
+}
+
 .App-link {
   color: #61dafb;
 }
