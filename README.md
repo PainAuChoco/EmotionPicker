@@ -5,6 +5,11 @@ You need Node.js 10.12.0 and Node Package Manager (npm) 6.4.1.
 A local server is also needed.
 
 ## Set up
+To clone the repository, either download the zip file or use :
+```
+git clone https://github.com/PainAuChoco/EmotionPicker
+```
+
 To install dependencies and load node packages : 
 ```
 cd emotion-picker
