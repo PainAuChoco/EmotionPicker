@@ -39,6 +39,7 @@ class App extends React.Component {
       paintings = paintings.concat(this.state.positive)
       paintings = paintings.concat(this.state.neutral)
       paintings = this.shuffleArray(paintings)
+      paintings = this.removeEdited(paintings)
       var currentWidth = paintings[0].imageMediaMetadata.width
       var currentHeight = paintings[0].imageMediaMetadata.height
       this.setState({
@@ -67,6 +68,16 @@ class App extends React.Component {
           directories: dirs
         })
       });
+  }
+
+  removeEdited = (paintings) => {
+    for(var i = 0; i < paintings.length; i++){
+      if(paintings[i].title.includes("edited")){
+        console.log("found")
+        paintings.splice(i,1)
+      }
+    }
+    return paintings
   }
 
   loadSubDir = (dirId) => {
