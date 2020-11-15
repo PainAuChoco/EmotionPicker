@@ -26,6 +26,7 @@ class App extends React.Component {
     currentWidth: 0,
     currentHeight: 0,
     loading: false,
+    imgGenerated: false,
   }
 
   componentDidMount() {
@@ -71,10 +72,10 @@ class App extends React.Component {
   }
 
   removeEdited = (paintings) => {
-    for(var i = 0; i < paintings.length; i++){
-      if(paintings[i].title.includes("edited")){
+    for (var i = 0; i < paintings.length; i++) {
+      if (paintings[i].title.includes("edited")) {
         console.log("found")
-        paintings.splice(i,1)
+        paintings.splice(i, 1)
       }
     }
     return paintings
@@ -206,6 +207,17 @@ class App extends React.Component {
       .catch(error => console.log(error))
   }
 
+  getGeneratedImages = () => {
+    var now = Date.now().toString()
+    fetch('/script/' + now)
+      .then((response) => console.log(response))
+      .then((res) => {
+        console.log("res")
+        this.setState({imgGenerated: true, imgId: now })
+      })
+  }
+
+
   render() {
     return (
       <div className="App">
@@ -217,11 +229,16 @@ class App extends React.Component {
             }
           </div>
           <div>
+            <Button onClick={this.getGeneratedImages}>Generate Image</Button>
+            {this.state.imgGenerated &&
+              <img src={process.env.PUBLIC_URL + '/images/'+  this.state.imgId + '_0.jpg'} />
+            }
           </div>
           {this.state.dirId === "" &&
             <DirectoriesButtons
               handleDirectorySelection={this.handleDirectorySelection}
             />
+
           }
           {this.state.loading &&
             <div className="spinner-border" role="status"></div>
@@ -244,7 +261,7 @@ class App extends React.Component {
                 </div>
               }
               {this.state.paintings.length < 10 &&
-                <div id="alert" className="mb-1">Warning: only {this.state.paintings.length -2} artworks left to classify in this genre !</div>
+                <div id="alert" className="mb-1">Warning: only {this.state.paintings.length - 2} artworks left to classify in this genre !</div>
               }
               {this.state.paintings.length >= 4 &&
                 <VotingButtons
