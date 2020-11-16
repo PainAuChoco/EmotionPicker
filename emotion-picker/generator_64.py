@@ -205,8 +205,10 @@ if __name__ == '__main__':
 
             img = fake[i] / 2 + 0.5
             img = np.transpose(img, (1, 2, 0))
+            print(np.uint8(img*255))
             img = Image.fromarray(np.uint8(img*255))
             img.save("public/images/"+ id + "_" + str(i)+'.jpg')
+            
             
             
             #imshow(fake[i], label_index,label_classes, True)

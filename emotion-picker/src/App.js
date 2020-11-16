@@ -4,6 +4,7 @@ import ImageContainer from './Components/ImageContainer'
 import VotingButtons from './Components/VotingButtons'
 import Button from "@material-ui/core/Button"
 import DirectoriesButtons from './Components/DirectoriesButtons'
+import ImageGenerator from "./Components/ImageGenerator"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
@@ -207,13 +208,16 @@ class App extends React.Component {
       .catch(error => console.log(error))
   }
 
-  getGeneratedImages = () => {
+  getGeneratedImages = (style, imgNumber, emotion) => {
     var now = Date.now().toString()
-    fetch('/script/' + now)
+    fetch('/script/' + now + '/' + style + '/' + imgNumber + '/' + emotion) 
       .then((response) => console.log(response))
       .then((res) => {
-        console.log("res")
-        this.setState({imgGenerated: true, imgId: now })
+        var imgIds = []
+        for(var i = 0; i < imgNumber; i++){
+          imgIds.push(process.env.PUBLIC_URL + "/images/" + now + '_' + i + '.jpg') 
+        }
+        this.setState({ imgGenerated: true, imgIds: imgIds })
       })
   }
 
@@ -228,12 +232,11 @@ class App extends React.Component {
               <Button id="returnbtn" variant="outlined" color="secondary" onClick={this.handleReturnClick}>Return</Button>
             }
           </div>
-          <div>
-            <Button onClick={this.getGeneratedImages}>Generate Image</Button>
-            {this.state.imgGenerated &&
-              <img src={process.env.PUBLIC_URL + '/images/'+  this.state.imgId + '_0.jpg'} />
-            }
-          </div>
+          <ImageGenerator 
+            show={this.state.imgGenerated}
+            imgIds={this.state.imgIds}
+            getGeneratedImages={this.getGeneratedImages}
+          />
           {this.state.dirId === "" &&
             <DirectoriesButtons
               handleDirectorySelection={this.handleDirectorySelection}

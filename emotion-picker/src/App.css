@@ -24,6 +24,22 @@
   color: white;
 }
 
+#form{
+  width: 100%;
+  display: flex;
+  margin: auto;
+  justify-content: center;
+  flex-direction: row;
+}
+
+#generator{
+  width: 512px
+}
+
+.select{
+  width: 100%
+}
+
 #title{
   top: 10px;
   left: 10px;
