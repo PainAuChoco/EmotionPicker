@@ -5,6 +5,7 @@ import VotingButtons from './Components/VotingButtons'
 import Button from "@material-ui/core/Button"
 import DirectoriesButtons from './Components/DirectoriesButtons'
 import ImageGenerator from "./Components/ImageGenerator"
+import Paper from "@material-ui/core/Paper"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
@@ -28,6 +29,7 @@ class App extends React.Component {
     currentHeight: 0,
     loading: false,
     imgGenerated: false,
+    display: null
   }
 
   componentDidMount() {
@@ -210,15 +212,23 @@ class App extends React.Component {
 
   getGeneratedImages = (style, imgNumber, emotion) => {
     var now = Date.now().toString()
-    fetch('/script/' + now + '/' + style + '/' + imgNumber + '/' + emotion) 
+    fetch('/script/' + now + '/' + style + '/' + imgNumber + '/' + emotion)
       .then((response) => console.log(response))
       .then((res) => {
         var imgIds = []
-        for(var i = 0; i < imgNumber; i++){
-          imgIds.push(process.env.PUBLIC_URL + "/images/" + now + '_' + i + '.jpg') 
+        for (var i = 0; i < imgNumber; i++) {
+          imgIds.push(process.env.PUBLIC_URL + "/images/" + now + '_' + i + '.jpg')
         }
         this.setState({ imgGenerated: true, imgIds: imgIds })
       })
+  }
+
+  displayGenerator = () => {
+    this.setState({ display: "Artwork Generator" })
+  }
+
+  displayEmotionPicker = () => {
+    this.setState({ display: "Emotion Picker" })
   }
 
 
@@ -227,57 +237,72 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           <div id="title">
-            Emotion Picker by Neurogram
+            {this.state.display !== null &&
+              <span> {this.state.display + " by "}</span>
+            }
+            <span id="neurogramTitle" onClick={() => this.setState({display: null})}>Neurogram</span>
             {this.state.dirId !== "" &&
               <Button id="returnbtn" variant="outlined" color="secondary" onClick={this.handleReturnClick}>Return</Button>
             }
           </div>
-          <ImageGenerator 
-            show={this.state.imgGenerated}
-            imgIds={this.state.imgIds}
-            getGeneratedImages={this.getGeneratedImages}
-          />
-          {this.state.dirId === "" &&
-            <DirectoriesButtons
-              handleDirectorySelection={this.handleDirectorySelection}
+          {this.state.display === null &&
+            <div className="d-flex">
+              <Paper className="mr-2" id="menuCard" elevation={5} onClick={this.displayGenerator} >Artwork Generator</Paper>
+              <Paper className="ml-2" id="menuCard" elevation={5} onClick={this.displayEmotionPicker} >Emotion Picker</Paper>
+            </div>
+          }
+          {this.state.display === "Artwork Generator" &&
+            <ImageGenerator
+              show={this.state.imgGenerated}
+              imgIds={this.state.imgIds}
+              getGeneratedImages={this.getGeneratedImages}
             />
-
           }
-          {this.state.loading &&
-            <div className="spinner-border" role="status"></div>
-          }
-          {this.state.paintings.length !== 0 &&
-            <React.Fragment>
-              <span>{this.state.dirName}</span>
-              <ImageContainer
-                url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[0].id}
-                width={this.state.currentWidth}
-                height={this.state.currentHeight}
-              />
-              {this.state.paintings[1] !== undefined &&
-                <div hidden>
-                  <ImageContainer
-                    url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[1].id}
-                    width={this.state.paintings[1].imageMediaMetadata.width}
-                    height={this.state.paintings[1].imageMediaMetadata.height}
-                  />
-                </div>
-              }
-              {this.state.paintings.length < 10 &&
-                <div id="alert" className="mb-1">Warning: only {this.state.paintings.length - 2} artworks left to classify in this genre !</div>
-              }
-              {this.state.paintings.length >= 4 &&
-                <VotingButtons
-                  callbackClick={this.handleVote}
+          {this.state.display === "Emotion Picker" &&
+            <div>
+              {this.state.dirId === "" &&
+                <DirectoriesButtons
+                  handleDirectorySelection={this.handleDirectorySelection}
                 />
+
               }
-            </React.Fragment>
-          }
-          {Object.entries(this.state.votes).length !== 0 &&
-            <Button id="submitBtn" className="noOutline" variant="contained" color="primary" value="Submit" onClick={this.submitVotes}>Submit</Button>
+              {this.state.loading &&
+                <div className="spinner-border" role="status"></div>
+              }
+              {this.state.paintings.length !== 0 &&
+                <React.Fragment>
+                  <span>{this.state.dirName}</span>
+                  <ImageContainer
+                    url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[0].id}
+                    width={this.state.currentWidth}
+                    height={this.state.currentHeight}
+                  />
+                  {this.state.paintings[1] !== undefined &&
+                    <div hidden>
+                      <ImageContainer
+                        url={GOOGLE_DRIVE_IMG_URL + this.state.paintings[1].id}
+                        width={this.state.paintings[1].imageMediaMetadata.width}
+                        height={this.state.paintings[1].imageMediaMetadata.height}
+                      />
+                    </div>
+                  }
+                  {this.state.paintings.length < 10 &&
+                    <div id="alert" className="mb-1">Warning: only {this.state.paintings.length - 2} artworks left to classify in this genre !</div>
+                  }
+                  {this.state.paintings.length >= 4 &&
+                    <VotingButtons
+                      callbackClick={this.handleVote}
+                    />
+                  }
+                </React.Fragment>
+              }
+              {Object.entries(this.state.votes).length !== 0 &&
+                <Button id="submitBtn" className="noOutline" variant="contained" color="primary" value="Submit" onClick={this.submitVotes}>Submit</Button>
+              }
+            </div>
           }
         </header>
-      </div>
+      </div >
     )
   }
 }

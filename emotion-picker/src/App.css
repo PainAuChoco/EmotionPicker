@@ -24,6 +24,21 @@
   color: white;
 }
 
+#neurogramTitle:hover{
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+#menuCard{
+  background-color: gray;
+  width: 200px;
+  height: 200px;
+}
+
+#menuCard:hover{
+  background-color: lightgrey;
+}
+
 #form{
   width: 100%;
   display: flex;
