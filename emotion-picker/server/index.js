@@ -33,7 +33,7 @@ app.get('/script/:id/:style/:number/:emotion', (req, res) => {
   python.on('close', (code) => {
     console.log(`child process close all stdio with code ${code}`);
     // send data to browser
-    res.send(dataList.join(""))
+    res.json(dataList)
   });
 })
 

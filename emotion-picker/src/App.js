@@ -10,7 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
 const GOOGLE_DRIVE_URL_START = "https://www.googleapis.com/drive/v2/files?q=%27";
-const GOOGLE_DRIVE_URL_END = "%27+in+parents&key=";
+const GOOGLE_DRIVE_URL_END = "%27+in+parents&maxResults=100000&key=";
 const GOOGLE_DRIVE_IMG_URL = "http://drive.google.com/uc?export=view&id=";
 const MAIN_FOLDER_ID = "11XVfzHUzqEStME89y-PgJZIOa-MlUODm"
 
@@ -42,6 +42,11 @@ class App extends React.Component {
       paintings = paintings.concat(this.state.negative)
       paintings = paintings.concat(this.state.positive)
       paintings = paintings.concat(this.state.neutral)
+      console.log(this.state.positive.length)
+      console.log(this.state.negative.length)
+      console.log(this.state.neutral.length)
+      console.log(paintings.length)
+
       paintings = this.shuffleArray(paintings)
       paintings = this.removeEdited(paintings)
       var currentWidth = paintings[0].imageMediaMetadata.width
@@ -213,8 +218,11 @@ class App extends React.Component {
   getGeneratedImages = (style, imgNumber, emotion) => {
     var now = Date.now().toString()
     fetch('/script/' + now + '/' + style + '/' + imgNumber + '/' + emotion)
-      .then((response) => console.log(response))
+      .then((response) => { return response.json()})
       .then((res) => {
+        console.log(typeof(res))
+        console.log(res[0])
+        this.setState({res: res})
         var imgIds = []
         for (var i = 0; i < imgNumber; i++) {
           imgIds.push(process.env.PUBLIC_URL + "/images/" + now + '_' + i + '.jpg')
