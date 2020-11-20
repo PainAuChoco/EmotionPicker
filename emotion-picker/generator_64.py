@@ -208,9 +208,6 @@ if __name__ == '__main__':
             print(np.uint8(img*255))
             img = Image.fromarray(np.uint8(img*255))
             img.save("public/images/"+ id + "_" + str(i)+'.jpg')
-            
-            
-            
             #imshow(fake[i], label_index,label_classes, True)
         #fig.tight_layout()
     #plt.show()

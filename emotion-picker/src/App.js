@@ -82,7 +82,6 @@ class App extends React.Component {
   removeEdited = (paintings) => {
     for (var i = 0; i < paintings.length; i++) {
       if (paintings[i].title.includes("edited")) {
-        console.log("found")
         paintings.splice(i, 1)
       }
     }
