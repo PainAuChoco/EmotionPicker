@@ -4,6 +4,7 @@ const pino = require('express-pino-logger')();
 const { spawn } = require('child_process');
 const fs = require('fs')
 const readline = require('readline');
+const opn = require('opn')
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -105,10 +106,12 @@ function getAccessToken(oAuth2Client, callback) {
     scope: SCOPES,
   });
   console.log('Authorize this app by visiting this url:', authUrl);
+  opn(authUrl, {app: "chrome"});
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
+  console.log("here")
   rl.question('Enter the code from that page here: ', (code) => {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
@@ -127,6 +130,7 @@ function getAccessToken(oAuth2Client, callback) {
 * Describe with given media and metaData and upload it using google.drive.create method()
 */
 function uploadFile(auth) {
+  console.log("uploadFile")
   const drive = google.drive({ version: 'v3', auth });
   const fileMetadata = {
     'name': 'photo.csv',
@@ -154,9 +158,15 @@ app.get('/test', (req,res) => {
   console.log("whatthefuck")
   fs.readFile('./credentials.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
-    // Authorize a client with credentials, then call the Google Drive API.
+    // Authorize a client with credentials, th,en call the Google Drive API.
     authorize(JSON.parse(content), uploadFile);
   });
+})
+
+app.get('/home/:code', (req,res) => {
+  let code = req.params.code
+  console.log(code)
+  res.send(code)
 })
 
 

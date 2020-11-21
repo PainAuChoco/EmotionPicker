@@ -217,11 +217,11 @@ class App extends React.Component {
   getGeneratedImages = (style, imgNumber, emotion) => {
     var now = Date.now().toString()
     fetch('/script/' + now + '/' + style + '/' + imgNumber + '/' + emotion)
-      .then((response) => { return response.json()})
+      .then((response) => { return response.json() })
       .then((res) => {
-        console.log(typeof(res))
+        console.log(typeof (res))
         console.log(res[0])
-        this.setState({res: res})
+        this.setState({ res: res })
         var imgIds = []
         for (var i = 0; i < imgNumber; i++) {
           imgIds.push(process.env.PUBLIC_URL + "/images/" + now + '_' + i + '.jpg')
@@ -238,6 +238,11 @@ class App extends React.Component {
     this.setState({ display: "Emotion Picker" })
   }
 
+  auth = () => {
+    fetch("/test")
+      .then(response => console.log(response))
+  }
+
 
   render() {
     return (
@@ -247,7 +252,7 @@ class App extends React.Component {
             {this.state.display !== null &&
               <span> {this.state.display + " by "}</span>
             }
-            <span id="neurogramTitle" onClick={() => this.setState({display: null})}>Neurogram</span>
+            <span id="neurogramTitle" onClick={() => this.setState({ display: null })}>Neurogram</span>
             {this.state.dirId !== "" &&
               <Button id="returnbtn" variant="outlined" color="secondary" onClick={this.handleReturnClick}>Return</Button>
             }
@@ -259,11 +264,14 @@ class App extends React.Component {
             </div>
           }
           {this.state.display === "Artwork Generator" &&
-            <ImageGenerator
-              show={this.state.imgGenerated}
-              imgIds={this.state.imgIds}
-              getGeneratedImages={this.getGeneratedImages}
-            />
+            <div>
+              <Button onClick={this.auth}>Here</Button>
+              <ImageGenerator
+                show={this.state.imgGenerated}
+                imgIds={this.state.imgIds}
+                getGeneratedImages={this.getGeneratedImages}
+              />
+            </div>
           }
           {this.state.display === "Emotion Picker" &&
             <div>
