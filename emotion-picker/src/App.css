@@ -30,13 +30,17 @@
 }
 
 #menuCard{
-  background-color: gray;
+  background-color: lightgrey;
   width: 200px;
   height: 200px;
 }
 
 #menuCard:hover{
-  background-color: lightgrey;
+  background-color: white;
+}
+
+#cardTitle{
+  font-size: medium;
 }
 
 #form{

@@ -13,7 +13,7 @@ import { ReactComponent as TeamSVG } from "./team.svg"
 
 const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
 const GOOGLE_DRIVE_URL_START = "https://www.googleapis.com/drive/v2/files?q=%27";
-const GOOGLE_DRIVE_URL_END = "%27+in+parents&maxResults=100000&key=";
+const GOOGLE_DRIVE_URL_END = "%27+in+parents&maxResults=1000&key=";
 const GOOGLE_DRIVE_IMG_URL = "http://drive.google.com/uc?export=view&id=";
 const MAIN_FOLDER_ID = "11XVfzHUzqEStME89y-PgJZIOa-MlUODm"
 
@@ -32,16 +32,21 @@ class App extends React.Component {
     currentHeight: 0,
     loading: false,
     imgGenerated: false,
-    display: null
+    display: null,
+    imgId: null,
+    driveSync: false,
+    matchings: {}
   }
 
   componentDidMount() {
     this.loadDirectoriesName()
+    console.log(this.state)
+
   }
 
   componentDidUpdate() {
     if (this.state.positive.length !== 0 && this.state.negative.length !== 0 && this.state.neutral.length !== 0) {
-      var paintings = []
+      var paintings = this.state.paintings
       paintings = paintings.concat(this.state.negative)
       paintings = paintings.concat(this.state.positive)
       paintings = paintings.concat(this.state.neutral)
@@ -61,7 +66,6 @@ class App extends React.Component {
         neutral: [],
         currentHeight: currentHeight,
         currentWidth: currentWidth,
-        loading: false
       })
     }
   }
@@ -77,9 +81,20 @@ class App extends React.Component {
       .then(jsonResp => {
         var dirs = jsonResp.items
         this.setState({
-          directories: dirs
+          directories: dirs,
+          loading: true
         })
-      });
+        return dirs
+      })
+      .then((dirs) => {
+        dirs.forEach(dir => {
+          var dirId = dir.id
+          this.loadSubDir(dirId)
+        });
+      })
+      .then(() => {
+        this.setState({ driveSync: true, loading: false })
+      })
   }
 
   removeEdited = (paintings) => {
@@ -101,9 +116,7 @@ class App extends React.Component {
       .then(response => response.json())
       .then(jsonResp => {
         jsonResp.items.forEach((subdir) => {
-          this.setState({
-            loading: true,
-          })
+          this.state.matchings[subdir.id] = subdir.parents[0].id
           this.loadData(subdir.id, subdir.title)
         })
       })
@@ -146,20 +159,33 @@ class App extends React.Component {
       .catch(error => console.log(error))
   }
 
-  handleVote = (type) => {
+  handleVote = (vote) => {
     var photoTitle = this.state.paintings[0].title
+    var type = this.findDirectoryNameById(this.state.paintings[0].parents[0].id)
+    console.log(type)
     var votes = this.state.votes
     votes.push({
       id: photoTitle,
-      type: this.state.dirName,
+      type: type,
       previous: photoTitle.split('_')[1].split('.')[0],
-      vote: type.toLowerCase()
+      vote: vote.toLowerCase()
     })
 
     this.setState({
       votes: votes
     })
     this.nextPhoto()
+  }
+
+  findDirectoryNameById = (id) => {
+    var res
+    console.log(id,this.state.matchings[id])
+    this.state.directories.forEach(dir => {
+      if (dir.id === this.state.matchings[id]) {
+        res = dir.title
+      }
+    });
+    return res
   }
 
   nextPhoto = () => {
@@ -222,11 +248,12 @@ class App extends React.Component {
     fetch('/script/' + now + '/' + style + '/' + imgNumber + '/' + emotion)
       .then((response) => { return response.json() })
       .then((res) => {
-        console.log(typeof (res))
-        console.log(res[0])
         this.setState({ res: res })
-        var imgId = process.env.PUBLIC_URL + "/images/" + now +'.png'
-        this.setState({ imgGenerated: false, imgId: imgId })
+        var imgId = process.env.PUBLIC_URL + "/images/" + now + '.png'
+        return imgId
+      })
+      .then((imgId) => {
+        this.setState({ imgGenerated: true, imgId: imgId })
       })
   }
 
@@ -259,12 +286,18 @@ class App extends React.Component {
           </div>
           {this.state.display === null &&
             <div className="d-flex">
-              <Paper className="mr-2" id="menuCard" elevation={5} onClick={this.displayGenerator} >
-                <BrainSVG/>
-              </Paper>
-              <Paper className="ml-2" id="menuCard" elevation={5} onClick={this.displayEmotionPicker} >
-                <TeamSVG/>
-              </Paper>
+              <div>
+                <Paper className="mr-2" id="menuCard" elevation={5} onClick={this.displayGenerator} >
+                  <BrainSVG className="mt-4" width="150" height="150" />
+                </Paper>
+                <span id="cardTitle">Generate original artworks</span>
+              </div>
+              <div>
+                <Paper className="ml-2" id="menuCard" elevation={5} onClick={this.displayEmotionPicker} >
+                  <TeamSVG className="mt-4" width="150" height="150" />
+                </Paper>
+                <span id="cardTitle">Help us improve our AI</span>
+              </div>
             </div>
           }
           {this.state.display === "Artwork Generator" &&
@@ -279,16 +312,16 @@ class App extends React.Component {
           }
           {this.state.display === "Emotion Picker" &&
             <div>
-              {this.state.dirId === "" &&
+              {/*this.state.dirId === "" &&
                 <DirectoriesButtons
                   handleDirectorySelection={this.handleDirectorySelection}
                 />
 
-              }
+        */}
               {this.state.loading &&
                 <div className="spinner-border" role="status"></div>
               }
-              {this.state.paintings.length !== 0 &&
+              {this.state.paintings.length !== 0 && this.state.driveSync &&
                 <React.Fragment>
                   <span>{this.state.dirName}</span>
                   <ImageContainer

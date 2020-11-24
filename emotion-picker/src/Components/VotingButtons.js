@@ -4,8 +4,8 @@ import Button from '@material-ui/core/Button';
 
 export default function VotingButtons({callbackClick}){
 
-    const handleClick = (type) => {
-        callbackClick(type)
+    const handleClick = (vote) => {
+        callbackClick(vote)
     }
 
     return(
