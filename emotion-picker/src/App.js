@@ -40,8 +40,6 @@ class App extends React.Component {
 
   componentDidMount() {
     this.loadDirectoriesName()
-    console.log(this.state)
-
   }
 
   componentDidUpdate() {
@@ -179,7 +177,6 @@ class App extends React.Component {
 
   findDirectoryNameById = (id) => {
     var res
-    console.log(id,this.state.matchings[id])
     this.state.directories.forEach(dir => {
       if (dir.id === this.state.matchings[id]) {
         res = dir.title
@@ -267,7 +264,8 @@ class App extends React.Component {
 
   auth = () => {
     fetch("/test")
-      .then(response => console.log(response))
+      .then((response) => {return response.json()})
+      .then((res) => window.open(res, '_self'))
   }
 
 

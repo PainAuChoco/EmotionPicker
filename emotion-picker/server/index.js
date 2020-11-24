@@ -72,6 +72,7 @@ app.post('/submit', (req, res) => {
 })
 
 const { google } = require('googleapis');
+const { auth } = require('googleapis/build/src/apis/abusiveexperiencereport');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
@@ -84,7 +85,7 @@ function authorize(credentials, callback) {
   console.log(credentials)
   const { client_secret, client_id, redirect_uris } = credentials.web;
   const oAuth2Client = new google.auth.OAuth2(
-    client_id, client_secret, redirect_uris[0]  );
+    client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
@@ -106,7 +107,7 @@ function getAccessToken(oAuth2Client, callback) {
     scope: SCOPES,
   });
   console.log('Authorize this app by visiting this url:', authUrl);
-  opn(authUrl, {app: "chrome"});
+  opn(authUrl, { app: "chrome" });
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -122,6 +123,7 @@ function getAccessToken(oAuth2Client, callback) {
         if (err) return console.error(err);
         console.log('Token stored to', TOKEN_PATH);
       });
+      console.log("anything")
       callback(oAuth2Client);
     });
   });
@@ -132,17 +134,16 @@ function getAccessToken(oAuth2Client, callback) {
 function uploadFile(auth) {
   console.log("uploadFile")
   const drive = google.drive({ version: 'v3', auth });
-  const fileMetadata = {
-    'name': 'photo.csv',
-    parents : ["1sDDrC0guO5ZhXklkLFZ4lF95ysG-NXCy"]
-  };
-  const media = {
-    mimeType: 'text/csv',
-    body: fs.createReadStream('votes1605782220495.csv')
-  };
+
   drive.files.create({
-    resource: fileMetadata,
-    media: media,
+    requestBody: {
+      'name': 'photo.csv',
+      parents: ["1sDDrC0guO5ZhXklkLFZ4lF95ysG-NXCy"]
+    },
+    media: {
+      mimeType: 'text/csv',
+      body: fs.createReadStream('votes1605782220495.csv')
+    },
     fields: 'id'
   }, (err, file) => {
     if (err) {
@@ -154,19 +155,38 @@ function uploadFile(auth) {
   });
 }
 
-app.get('/test', (req,res) => {
-  console.log("whatthefuck")
+app.get('/test', (req, res) => {
   fs.readFile('./credentials.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
     // Authorize a client with credentials, th,en call the Google Drive API.
-    authorize(JSON.parse(content), uploadFile);
+    //authorize(JSON.parse(content), uploadFile);
+    var credentials = JSON.parse(content)
+    const { client_secret, client_id, redirect_uris } = credentials.web;
+    const oAuth2Client = new google.auth.OAuth2(
+      client_id, client_secret, redirect_uris[0]);
+    authUrl = oAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: SCOPES,
+    });
+    console.log('authurl ', authUrl)
+    res.json(authUrl)
   });
 })
 
-app.get('/home/:code', (req,res) => {
+
+app.get('/home/:code', (req, res) => {
   let code = req.params.code
-  console.log(code)
-  res.send(code)
+  console.log("\n code is ", code)
+  oAuth2Client.getToken(code, (err, token) => {
+    if (err) return console.error('Error retrieving access token', err);
+    oAuth2Client.setCredentials(token);
+    // Store the token to disk for later program executions
+    fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+      if (err) return console.error(err);
+      console.log('Token stored to', TOKEN_PATH);
+    });
+    console.log("anything")
+  })
 })
 
 
