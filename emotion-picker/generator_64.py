@@ -76,7 +76,7 @@ def combine_vectors(x, y):
 def get_dir_gen_w(category):
     return f'./weights/{category}/netG_{category}_64.weight'
 
-def generate(selected_emotion, selected_style, nb_img):
+def generate(selected_emotion, selected_style, nb_img, id):
     z_dim = 100
     device = 'cpu'
     label_classes = ['negative', 'neutral', 'positive']
@@ -98,12 +98,12 @@ def generate(selected_emotion, selected_style, nb_img):
     fake = gen(noise_and_labels).data.cpu()
 
     try:
-        os.mkdir(f"./images/")
+        os.mkdir(f"./public/images/")
     except OSError as exc:
         if exc.errno != errno.EEXIST:
             raise
         pass
-    vutils.save_image(fake.data, './images/fake.png' , normalize=True)
+    vutils.save_image(fake.data, './public/images/' + id + '.png' , normalize=True)
 
 def download_file_from_google_drive(style):
 
@@ -159,56 +159,11 @@ def download_file_from_google_drive(style):
 
 if __name__ == '__main__':
 
-    save = False
-    device = 'cpu'
-
-    z_dim = 100
-    label_classes = ['negative', 'neutral', 'positive']
-    style_classes = ['portrait', 'landscape', 'abstract', "flower-painting"]
-    n_classes = len(label_classes)
-
     num_img_to_gen = int(sys.argv[3])
     emotion = str(sys.argv[2])
     style = str(sys.argv[1])
     id = str(sys.argv[5])
     save = str(sys.argv[4])
 
-    if num_img_to_gen not in np.linspace(1, 20, 20): raise NameError('# of images to generate must be between 1 and 20')
-    if emotion not in label_classes: raise NameError(f'Input emotion must be one of those: {label_classes}')
-    if style not in style_classes: raise NameError(f'Input style must be one of those: {style_classes}')
-
-    download_file_from_google_drive(style)
-
-    path = get_dir_gen_w(style)
-    label_index = label_classes.index(emotion)
-    one_hot_labels = get_one_hot_labels_from_str(num_img_to_gen, emotion, label_classes).to(device)
-    noise = get_noise(num_img_to_gen, z_dim, device=device).to(device)
-    noise_and_labels = combine_vectors(noise, one_hot_labels.float())
-
-    gen = Generator(input_dim = noise_and_labels.shape[1]).to(device)
-    gen.load_state_dict(torch.load(path, map_location=torch.device(device)))
-    fake = gen(noise_and_labels).to(device).detach().numpy()
-
-    if num_img_to_gen == 1:
-        if save:
-            imshow(fake[0], label_index,label_classes, True)
-        else:
-            imshow(fake[0], label_index,label_classes)
-    else:
-        fig = plt.figure(figsize=(10, 4))
-        for i in np.arange(num_img_to_gen):
-            ax = fig.add_subplot(2, num_img_to_gen/2, i+1)
-            fig.patch.set_visible(False)
-            ax.set_aspect("auto")
-            ax.axis('off')
-            ax.autoscale()
-
-            img = fake[i] / 2 + 0.5
-            img = np.transpose(img, (1, 2, 0))
-            print(np.uint8(img*255))
-            img = Image.fromarray(np.uint8(img*255))
-            img.save("public/images/"+ id + "_" + str(i)+'.jpg')
-            #imshow(fake[i], label_index,label_classes, True)
-        #fig.tight_layout()
-    #plt.show()
+    generate(emotion, style, num_img_to_gen, id)
     

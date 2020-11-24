@@ -8,6 +8,9 @@ import ImageGenerator from "./Components/ImageGenerator"
 import Paper from "@material-ui/core/Paper"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { ReactComponent as BrainSVG } from "./brain.svg"
+import { ReactComponent as TeamSVG } from "./team.svg"
+
 const GOOGLE_API_KEY = "AIzaSyAcNznsnSs9fgpA47oE9EuTYflRSeH6RSc";
 const GOOGLE_DRIVE_URL_START = "https://www.googleapis.com/drive/v2/files?q=%27";
 const GOOGLE_DRIVE_URL_END = "%27+in+parents&maxResults=100000&key=";
@@ -222,11 +225,8 @@ class App extends React.Component {
         console.log(typeof (res))
         console.log(res[0])
         this.setState({ res: res })
-        var imgIds = []
-        for (var i = 0; i < imgNumber; i++) {
-          imgIds.push(process.env.PUBLIC_URL + "/images/" + now + '_' + i + '.jpg')
-        }
-        this.setState({ imgGenerated: true, imgIds: imgIds })
+        var imgId = process.env.PUBLIC_URL + "/images/" + now +'.png'
+        this.setState({ imgGenerated: false, imgId: imgId })
       })
   }
 
@@ -259,8 +259,12 @@ class App extends React.Component {
           </div>
           {this.state.display === null &&
             <div className="d-flex">
-              <Paper className="mr-2" id="menuCard" elevation={5} onClick={this.displayGenerator} >Artwork Generator</Paper>
-              <Paper className="ml-2" id="menuCard" elevation={5} onClick={this.displayEmotionPicker} >Emotion Picker</Paper>
+              <Paper className="mr-2" id="menuCard" elevation={5} onClick={this.displayGenerator} >
+                <BrainSVG/>
+              </Paper>
+              <Paper className="ml-2" id="menuCard" elevation={5} onClick={this.displayEmotionPicker} >
+                <TeamSVG/>
+              </Paper>
             </div>
           }
           {this.state.display === "Artwork Generator" &&
@@ -268,7 +272,7 @@ class App extends React.Component {
               <Button onClick={this.auth}>Here</Button>
               <ImageGenerator
                 show={this.state.imgGenerated}
-                imgIds={this.state.imgIds}
+                imgId={this.state.imgId}
                 getGeneratedImages={this.getGeneratedImages}
               />
             </div>

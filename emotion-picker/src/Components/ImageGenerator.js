@@ -14,7 +14,7 @@ class ImageGenerator extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.imgIds !== this.props.imgIds) {
+        if (prevProps.imgId !== this.props.imgId) {
             this.setState({ loading: false })
         }
     }
@@ -49,6 +49,9 @@ class ImageGenerator extends React.Component {
                     <select id="number" name="number" className="select form-control ml-1">
                         <option value="2">2</option>
                         <option value="8">8</option>
+                        <option value="16">16</option>
+                        <option value="32">32</option>
+                        <option value="64">64</option>
                     </select>
                 </div>
                 <Button variant="contained" className="noOutline mt-1 ml-1" onClick={this.handleGenerateClick} color="primary">Generate Image</Button>
@@ -56,18 +59,9 @@ class ImageGenerator extends React.Component {
                     {this.state.loading &&
                         <div className="spinner-border mt-2" role="status"></div>
                     }
-                    <Grid item xs={12}>
-                        <Grid className="mt-2" container justify="flex-start" spacing={1}>
-                            {this.props.show && this.props.imgIds.map((index, key) => (
-                                <React.Fragment key={key}>
-                                    <Grid key={key} item>
-                                        <img src={index} />
-                                    </Grid>
-                                </React.Fragment>
-                            ))
-                            }
-                        </Grid>
-                    </Grid>
+                    {this.props.show &&
+                        <img className='mt-3' src={this.props.imgId} />
+                    }
                 </div>
             </div >
         )
