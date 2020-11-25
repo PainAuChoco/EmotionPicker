@@ -5,6 +5,13 @@ const { spawn } = require('child_process');
 const fs = require('fs')
 const readline = require('readline');
 const opn = require('opn')
+const { google } = require('googleapis');
+const { auth } = require('googleapis/build/src/apis/abusiveexperiencereport');
+const { file } = require('googleapis/build/src/apis/file');
+
+// If modifying these scopes, delete token.json.
+const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
+const TOKEN_PATH = 'token.json';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,13 +46,36 @@ app.get('/script/:id/:style/:number/:emotion', (req, res) => {
   });
 })
 
-app.post('/submit', (req, res) => {
+app.post('/submit/:id', (req, res) => {
   let votes = req.body.votes
+  let id = req.params.id
+  let code = req.body.authCode
+  let filename = 'votes_' + id + '.csv'
 
-  let writeStream = fs.createWriteStream('./votes' + Date.now().toString() + '.csv')
+  console.log(code)
+
+  let writeStream = fs.createWriteStream('./votes/' + filename)
 
   writeStream.on('finish', () => {
-    console.log('finish write stream, file created')
+    fs.readFile('./credentials.json', (err, content) => {
+      if (err) return console.log('Error loading client secret file:', err);
+      // Authorize a client with credentials, th,en call the Google Drive API.
+      //authorize(JSON.parse(content), uploadFile);
+      var credentials = JSON.parse(content)
+      const { client_secret, client_id, redirect_uris } = credentials.web;
+      const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
+      oAuth2Client.getToken(code, (err, token) => {
+        if (err) return console.error('Error retrieving access token', err);
+        oAuth2Client.setCredentials(token);
+        // Store the token to disk for later program executions
+        fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+          if (err) return console.error(err);
+          console.log('Token stored to', TOKEN_PATH);
+        });
+        uploadFile(oAuth2Client, filename)
+      })
+    })
   }).on('error', (err) => {
     console.log(err)
   })
@@ -70,13 +100,6 @@ app.post('/submit', (req, res) => {
   res.sendStatus(200)
 
 })
-
-const { google } = require('googleapis');
-const { auth } = require('googleapis/build/src/apis/abusiveexperiencereport');
-
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
-const TOKEN_PATH = 'token.json';
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the given callback function.
@@ -131,18 +154,18 @@ function getAccessToken(oAuth2Client, callback) {
 /**
 * Describe with given media and metaData and upload it using google.drive.create method()
 */
-function uploadFile(auth) {
+function uploadFile(auth, filename) {
   console.log("uploadFile")
   const drive = google.drive({ version: 'v3', auth });
 
   drive.files.create({
     requestBody: {
-      'name': 'photo.csv',
+      'name': filename,
       parents: ["1sDDrC0guO5ZhXklkLFZ4lF95ysG-NXCy"]
     },
     media: {
       mimeType: 'text/csv',
-      body: fs.createReadStream('votes1605782220495.csv')
+      body: fs.createReadStream('./votes/' + filename)
     },
     fields: 'id'
   }, (err, file) => {
@@ -155,7 +178,7 @@ function uploadFile(auth) {
   });
 }
 
-app.get('/test', (req, res) => {
+app.get('/register', (req, res) => {
   fs.readFile('./credentials.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
     // Authorize a client with credentials, th,en call the Google Drive API.
@@ -173,21 +196,6 @@ app.get('/test', (req, res) => {
   });
 })
 
-
-app.get('/home/:code', (req, res) => {
-  let code = req.params.code
-  console.log("\n code is ", code)
-  oAuth2Client.getToken(code, (err, token) => {
-    if (err) return console.error('Error retrieving access token', err);
-    oAuth2Client.setCredentials(token);
-    // Store the token to disk for later program executions
-    fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-      if (err) return console.error(err);
-      console.log('Token stored to', TOKEN_PATH);
-    });
-    console.log("anything")
-  })
-})
 
 
 app.listen(3001, () =>

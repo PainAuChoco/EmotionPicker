@@ -35,11 +35,23 @@ class App extends React.Component {
     display: null,
     imgId: null,
     driveSync: false,
-    matchings: {}
+    matchings: {},
+    authCode: null
   }
 
   componentDidMount() {
-    this.loadDirectoriesName()
+    if (this.state.authCode === null && window.location.href.includes("code")) {
+      console.log(window.location.href)
+      var temp = window.location.href.split("code=")
+      var code = temp[1].split('&scope')[0]
+      code = code.replace('%2F', '/')
+      this.setState({
+        authCode: code
+      })
+      this.loadDirectoriesName()
+    } else {
+      this.register()
+    }
   }
 
   componentDidUpdate() {
@@ -48,9 +60,6 @@ class App extends React.Component {
       paintings = paintings.concat(this.state.negative)
       paintings = paintings.concat(this.state.positive)
       paintings = paintings.concat(this.state.neutral)
-      console.log(this.state.positive.length)
-      console.log(this.state.negative.length)
-      console.log(this.state.neutral.length)
       console.log(paintings.length)
 
       paintings = this.shuffleArray(paintings)
@@ -87,7 +96,17 @@ class App extends React.Component {
       .then((dirs) => {
         dirs.forEach(dir => {
           var dirId = dir.id
-          this.loadSubDir(dirId)
+          switch (dir.title) {
+            case 'portrait':
+            case 'landscape':
+            case 'asbtract':
+            case 'animal-painting':
+            case 'cityscape':
+            case 'flower':
+              this.loadSubDir(dirId);
+              break;
+          }
+          //this.loadSubDir(dirId)
         });
       })
       .then(() => {
@@ -229,13 +248,14 @@ class App extends React.Component {
 
   submitVotes = () => {
     var votes = this.state.votes
+    var authCode = this.state.authCode
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ votes: votes })
+      body: JSON.stringify({ votes: votes, authCode: authCode })
     }
 
-    fetch('/submit', requestOptions)
+    fetch('/submit/' + Date.now().toString(), requestOptions)
       .then(res => console.log(res))
       .catch(error => console.log(error))
   }
@@ -260,14 +280,14 @@ class App extends React.Component {
 
   displayEmotionPicker = () => {
     this.setState({ display: "Emotion Picker" })
+
   }
 
-  auth = () => {
-    fetch("/test")
-      .then((response) => {return response.json()})
+  register = () => {
+    fetch("/register")
+      .then((response) => { return response.json() })
       .then((res) => window.open(res, '_self'))
   }
-
 
   render() {
     return (
@@ -300,7 +320,6 @@ class App extends React.Component {
           }
           {this.state.display === "Artwork Generator" &&
             <div>
-              <Button onClick={this.auth}>Here</Button>
               <ImageGenerator
                 show={this.state.imgGenerated}
                 imgId={this.state.imgId}
