@@ -3,3 +3,4 @@ emotion-picker/.env
 emotion-picker/public/images
 emotion-picker/votes/
 emotion-picker/token.json
+node_modules

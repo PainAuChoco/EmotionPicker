@@ -5,6 +5,7 @@ import VotingButtons from './Components/VotingButtons'
 import Button from "@material-ui/core/Button"
 import DirectoriesButtons from './Components/DirectoriesButtons'
 import ImageGenerator from "./Components/ImageGenerator"
+import SuccessSnackBar from './Components/SuccessSnackBar'
 import Paper from "@material-ui/core/Paper"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -36,21 +37,24 @@ class App extends React.Component {
     imgId: null,
     driveSync: false,
     matchings: {},
-    authCode: null
+    authCode: null,
+    snackbarOpen: false,
+    snackBarMessage: ""
   }
 
   componentDidMount() {
     if (this.state.authCode === null && window.location.href.includes("code")) {
-      console.log(window.location.href)
       var temp = window.location.href.split("code=")
       var code = temp[1].split('&scope')[0]
       code = code.replace('%2F', '/')
       this.setState({
-        authCode: code
+        authCode: code,
+        display: "Emotion Picker",
+        loading: true
       })
+      //simply change url without redirection
+      window.history.pushState({}, null, "/")
       this.loadDirectoriesName()
-    } else {
-      this.register()
     }
   }
 
@@ -74,6 +78,10 @@ class App extends React.Component {
         currentHeight: currentHeight,
         currentWidth: currentWidth,
       })
+    }
+
+    if(this.state.display === "Emotion Picker" && this.state.authCode === null){
+      this.register()
     }
   }
 
@@ -179,7 +187,6 @@ class App extends React.Component {
   handleVote = (vote) => {
     var photoTitle = this.state.paintings[0].title
     var type = this.findDirectoryNameById(this.state.paintings[0].parents[0].id)
-    console.log(type)
     var votes = this.state.votes
     votes.push({
       id: photoTitle,
@@ -256,7 +263,14 @@ class App extends React.Component {
     }
 
     fetch('/submit/' + Date.now().toString(), requestOptions)
-      .then(res => console.log(res))
+      .then((res) => {
+        if (res.ok) {
+          this.setState({
+            votes: [],
+          })
+          this.displaySuccessSnackbar('Your votes were successfuly submited ! Thank you for your participation')
+        }
+      })
       .catch(error => console.log(error))
   }
 
@@ -274,19 +288,32 @@ class App extends React.Component {
       })
   }
 
+  displaySuccessSnackbar = (message) => {
+    this.setState({
+      snackbarOpen: true,
+      snackBarMessage: message
+    })
+  }
+
   displayGenerator = () => {
     this.setState({ display: "Artwork Generator" })
   }
 
   displayEmotionPicker = () => {
     this.setState({ display: "Emotion Picker" })
-
   }
 
   register = () => {
     fetch("/register")
       .then((response) => { return response.json() })
       .then((res) => window.open(res, '_self'))
+  }
+
+  handleCloseError = () => {
+    this.setState({
+      snackbarOpen: false,
+      snackBarMessage: ""
+    })
   }
 
   render() {
@@ -298,9 +325,6 @@ class App extends React.Component {
               <span> {this.state.display + " by "}</span>
             }
             <span id="neurogramTitle" onClick={() => this.setState({ display: null })}>Neurogram</span>
-            {this.state.dirId !== "" &&
-              <Button id="returnbtn" variant="outlined" color="secondary" onClick={this.handleReturnClick}>Return</Button>
-            }
           </div>
           {this.state.display === null &&
             <div className="d-flex">
@@ -329,12 +353,6 @@ class App extends React.Component {
           }
           {this.state.display === "Emotion Picker" &&
             <div>
-              {/*this.state.dirId === "" &&
-                <DirectoriesButtons
-                  handleDirectorySelection={this.handleDirectorySelection}
-                />
-
-        */}
               {this.state.loading &&
                 <div className="spinner-border" role="status"></div>
               }
@@ -363,12 +381,19 @@ class App extends React.Component {
                       callbackClick={this.handleVote}
                     />
                   }
+                  {Object.entries(this.state.votes).length !== 0 &&
+                    <Button id="submitBtn" className="noOutline" variant="contained" color="primary" value="Submit" onClick={this.submitVotes}>Submit {<span id="parenthesis">({" " + this.state.votes.length} vote(s) so far)</span>}</Button>
+                  }
                 </React.Fragment>
               }
-              {Object.entries(this.state.votes).length !== 0 &&
-                <Button id="submitBtn" className="noOutline" variant="contained" color="primary" value="Submit" onClick={this.submitVotes}>Submit</Button>
-              }
+
             </div>
+          }
+          {this.state.snackbarOpen &&
+            <SuccessSnackBar
+              message={this.state.snackBarMessage}
+              handleCloseError={this.handleCloseError}
+            />
           }
         </header>
       </div >

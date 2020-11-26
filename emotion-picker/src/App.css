@@ -75,10 +75,17 @@
 }
 
 #submitBtn{
-  top: 88%;
-  left: 90%;
-  position: absolute;
+  margin-top: 1em;
+  width: 100%;
   background-color: green;
+}
+
+#parenthesis{
+  text-transform: lowercase;
+}
+
+.voteBtn {
+  text-transform: lowercase;
 }
 
 .App-link {
